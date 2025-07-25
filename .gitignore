@@ -1,4 +1,4 @@
-test.py
-*.pyc
 __pycache__
-*.py
+build
+dist
+hugetsu.egg-info

@@ -1,79 +1,116 @@
-class Unit:
-    """単位型クラス
-
-    Parameters::
-
-        name : str
-            単位名
-        ratio : float
-            SI単位系に対する比率
-        type :int
-            単位の種類
-            1: 長さ
-            2: 質量
+class Unit():
     """
+単位型クラス  
+| Parameters    | type  | description               |
+| ---           | ---   | ---                       |
+| name          | str   | 単位名                    |
+| ratio         | float | SI単位系に対する比率      |
+| type          | str   | 単位の種類を区別する一意の値 |
+| content       | float | SI単位系で表した時の値 |
+
+使用可能メソッド  
+| Method        | type  | args      | description                   |
+| ---           | ---   | ---       | ---                           |
+| value         | float | content   | 値を返す <br> 引数で値を書き換え可能 |
+| si            | float | content   | SI単位系に直した時の値を返す<br> 引数にSI単位系で表した時の値を入れることで、値を書き換え可能 |
+    """
+
     name: str
     ratio: float
-    type: 1 | 2
+    type: str
 
-def __ScalarCalc(func)->"Length"|"Weight":
-    def switch(*args, **kwargs):
-        result:__Scalar = func(*args, **kwargs)
-        if isinstance(result,Length):
-            return Length(result)
-        elif isinstance(result,Weight):
-            return Weight(result)
-    return switch
-class __Scalar(float):
-    def __new__(self, ___x:int|float, unit: Unit) -> "__Scalar":
-        self.___x = float(___x)
-        self.unit = unit
-        return float.__new__(self, ___x)
+    def __init__(self, content = 0):
+        self.value(content)
     
-    def __init__(self, ___x: int | float, unit: Unit) -> "__Scalar":
-        self.___x = float(___x)
-        self.unit = unit
-        super().__init__()
-
-    @__ScalarCalc
-    def __add__(
-        self, __x: float) -> "__Scalar": return __Scalar(super().__add__(__x), self.unit)
+    def __str__(self):
+        return f"{self.value()} {self.name}"
     
-    @__ScalarCalc
-    def __sub__(
-        self, __x: float) -> "__Scalar": return __Scalar(super().__sub__(__x), self.unit)
-    @__ScalarCalc
-    def __mul__(
-        self, __x: float) -> "__Scalar": return __Scalar(super().__mul__(__x), self.unit)
-    @__ScalarCalc
-    def __truediv__(
-        self, __x: float) -> "__Scalar": return __Scalar(super().__truediv__(__x), self.unit)
-    @__ScalarCalc
-    def __floordiv__(
-        self, __x: float) -> "__Scalar": return __Scalar(super().__floordiv__(__x), self.unit)
-    @__ScalarCalc
-    def __eq__(self, __x: "__Scalar") -> bool:
-        if type(__x) != __Scalar:
-            return False
-        return (self.___x/self.unit.ratio) == __x/__x.unit.ratio
-    @__ScalarCalc
-    def __lt__(self, __x: "__Scalar") -> bool:
-        return (self.___x/self.unit.ratio) < __x.___x/__x.unit.ratio
-    @__ScalarCalc
-    def __gt__(self, __x: "__Scalar") -> bool:
-        return (self.___x/self.unit.ratio) > __x.___x/__x.unit.ratio
+    def si(self, content = None):
+        if content is not None:
+            self.content = content
+        return self.content
+    
+    def value(self, content = None):
+        if content is not None:
+            self.content = content / self.ratio
+        return self.content * self.ratio
+    
+    def type_check(self, other):
+        return self.type == other.type
 
-    def format(self):
-        return f"{self.___x} {self.unit.name}"
+    def __add__(self, other):
+        if self.type_check(other):
+            return type(self)((self.si() + other.si()) * self.ratio)
+        else:
+            raise TypeError("異なる種類の単位の加算は出来ません")
+        
+    def __sub__(self, other):
+        if self.type_check(other):
+            return type(self)((self.si() - other.si()) * self.ratio)
+        else:
+            raise TypeError("異なる種類の単位の減算は出来ません")
+        
+    def __mul__(self, other):
+        if isinstance(other, (float, int)):
+            return type(self)((self.si() * other) * self.ratio)
+        elif self.type_check(other):
+            return type(self)((self.si() * other.si()) * self.ratio)
+        else:
+            raise TypeError("異なる種類の単位の乗算は出来ません")
+        
+    def __rmul__(self, other):
+        if isinstance(other, (int, float)):
+            return type(self)((other * self.si()) * self.ratio)
+        else:
+            raise TypeError("異なる種類の単位の乗算は出来ません")
+        
+    def __truediv__(self, other):
+        if isinstance(other, (float, int)):
+            return type(self)((self.si() / other) * self.ratio)
+        elif self.type_check(other):
+            return type(self)((self.si() / other.si()) * self.ratio)
+        else:
+            raise TypeError("異なる種類の単位の除算は出来ません")
+    
+    def __floordiv__(self, other):
+        if isinstance(other, (float, int)):
+            return type(self)(int((self.si() / other) * self.ratio))
+        elif self.type_check(other):
+            return type(self)(int((self.si() / other.si()) * self.ratio))
+        else:
+            raise TypeError("異なる種類の単位の除算は出来ません")
+    
+    def __eq__(self, other):
+        if self.type_check(other):
+            return self.si() == other.si()
+        else:
+            raise TypeError("異なる種類の単位の比較は出来ません")
+    
+    def __lt__(self, other):
+        if self.type_check(other):
+            return self.si() < other.si()
+        else:
+            raise TypeError("異なる種類の単位の比較は出来ません")
+    
+    def __gt__(self, other):
+        if self.type_check(other):
+            return self.si() > other.si()
+        else:
+            raise TypeError("異なる種類の単位の比較は出来ません")
 
-    def convert(self, unit: Unit) -> "__Scalar":
-        if self.unit.type != unit.type:
-            raise NotImplementedError("Unsupported unit type")
-        return __Scalar((self.___x/self.unit.ratio)*unit.ratio, unit)
 
-class Length(__Scalar):
-    def __init__(self, ___x: int | float, unit: Unit) -> "Length":
-        super().__init__(___x,unit)
-class Weight(__Scalar):
-    def __init__(self, ___x: int | float, unit: Unit) -> "Weight":
-        super().__init__(___x,unit)
+class Length(Unit):
+    name    = "m"
+    ratio   = 1.0
+    type    = "length"
+
+    def __init__(self, content = 0) -> "Length":
+        super().__init__(content)
+
+class Weight(Unit):
+    name    = "kg"
+    ratio   = 1.0
+    type    = "weight"
+
+    def __init__(self, content = 0) -> "Weight":
+        super().__init__(content)

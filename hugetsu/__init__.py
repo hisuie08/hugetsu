@@ -1,2 +1,3 @@
-from hugetsu.common import Length, Weight
-from hugetsu.length import *
+from .common import Length, Weight
+from .length import *
+from .weight import *

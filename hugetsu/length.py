@@ -1,57 +1,56 @@
-from hugetsu.common import *
+from .common import Length
 
-class Metre(Unit):
+class Metre(Length):
     name = "m"
     ratio = 1.0
-    type = 1
 
-class Ri(Unit):
+
+class Ri(Length):
     name="里"
     ratio = 0.0002546
-    type=1
 
-class Cho(Unit):
+
+class Cho(Length):
     name="町"
     ratio = 0.0091667
-    type = 1
 
-class Ken(Unit):
+
+class Ken(Length):
     name="間"
     ratio = 0.55
-    type = 1
 
 
-class Jou(Unit):
+
+class Jou(Length):
     name = "丈"
     ratio = 0.33
-    type = 1
 
-class Hiro(Unit):
+
+class Hiro(Length):
     name = "尋"
     ratio = 0.33
-    type = 1
 
-class Shaku(Unit):
+
+class Shaku(Length):
     name="尺"
     ratio = 3.3
-    type = 1
 
-class Sun(Unit):
+
+class Sun(Length):
     name="寸"
     ratio = 33.0
-    type = 1
 
-class LengthBu(Unit):
+
+class LengthBu(Length):
     name="分"
     ratio = 330.0
-    type = 1
 
-class Rin(Unit):
+
+class Rin(Length):
     name="厘"
     ratio=3300.0
-    type = 1
 
-class Mou(Unit):
+
+class Mou(Length):
     name="毛"
     ratio=33000.0
-    type = 1
